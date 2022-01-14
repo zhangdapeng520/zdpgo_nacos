@@ -1,23 +1,23 @@
-package zgo_nacos
+package zdpgo_nacos
 
 import (
-	"zgo_config"
+	"zdpgo_config"
 )
 
 var (
 	// nacos配置信息
-	NacosConfig = &zgo_config.NacosConfig{}
+	NacosConfig = &zdpgo_config.NacosConfig{}
 
 	// service配置信息
-	ServiceConfig = &zgo_config.ServiceConfig{}
+	ServiceConfig = &zdpgo_config.ServiceConfig{}
 
 	// web配置信息
-	WebConfig = &zgo_config.WebConfig{}
+	WebConfig = &zdpgo_config.WebConfig{}
 )
 
 // 读取nacos配置信息
 func InitNacosConfig() {
-	zgo_config.InitDefaultConfig(&NacosConfig)
+	zdpgo_config.InitDefaultConfig(&NacosConfig)
 }
 
 // 从nacos读取service信息

@@ -1,7 +1,8 @@
-package zgo_nacos
+package zdpgo_nacos
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/nacos-group/nacos-sdk-go/clients"
 	"github.com/nacos-group/nacos-sdk-go/clients/config_client"
@@ -11,6 +12,7 @@ import (
 
 // 获取nacos客户端
 func GetNacosClient(nacosIp string, nacosPort uint16, namespaceId string) config_client.IConfigClient {
+	fmt.Println("nacos配置：", nacosIp, nacosPort, namespaceId)
 	sc := []constant.ServerConfig{
 		{
 			IpAddr: nacosIp,
@@ -34,6 +36,7 @@ func GetNacosClient(nacosIp string, nacosPort uint16, namespaceId string) config
 		"clientConfig":  cc,
 	})
 	if err != nil {
+		fmt.Println("获取nacos配置失败：", err.Error())
 		panic(err)
 	}
 	return configClient
@@ -41,6 +44,7 @@ func GetNacosClient(nacosIp string, nacosPort uint16, namespaceId string) config
 
 // 获取nacos配置信息
 func GetNacosContent(client config_client.IConfigClient, dataId, group string) string {
+	fmt.Println("nacos配置组：", dataId, group)
 	content, err := client.GetConfig(vo.ConfigParam{
 		DataId: dataId,
 		Group:  group})

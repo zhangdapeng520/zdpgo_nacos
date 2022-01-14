@@ -1,4 +1,4 @@
-package zgo_nacos
+package zdpgo_nacos
 
 import (
 	"encoding/json"
@@ -9,8 +9,8 @@ import (
 	"github.com/nacos-group/nacos-sdk-go/clients"
 	"github.com/nacos-group/nacos-sdk-go/common/constant"
 	"github.com/nacos-group/nacos-sdk-go/vo"
-	"zgo_config"
-	"zgo_nacos/test/config"
+	"zdpgo_config"
+	"zdpgo_nacos/test/config"
 )
 
 func TestConfig(t *testing.T) {
@@ -79,7 +79,7 @@ func TestGetServiceUserConfig(t *testing.T) {
 	client := GetNacosClient("127.0.0.1", 8848, "1a67e97c-fa54-44dd-961b-4dcaeed9217c")
 	content := GetNacosContent(client, "user_service.json", "dev")
 	fmt.Println(content)
-	serverConfig := zgo_config.ServiceConfig{}
+	serverConfig := zdpgo_config.ServiceConfig{}
 	ParseNacosJsonConfig(&serverConfig, content)
 	fmt.Println(serverConfig.Mysql)
 }
