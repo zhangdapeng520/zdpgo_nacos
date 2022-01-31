@@ -2,17 +2,17 @@ package zdpgo_nacos
 
 import (
 	"encoding/json"
+	"github.com/zhangdapeng520/zdpgo_zap"
 
 	"github.com/nacos-group/nacos-sdk-go/clients"
 	"github.com/nacos-group/nacos-sdk-go/clients/config_client"
 	"github.com/nacos-group/nacos-sdk-go/common/constant"
 	"github.com/nacos-group/nacos-sdk-go/vo"
-	"github.com/zhangdapeng520/zdpgo_log"
 )
 
 // Nacos nacos核心对象
 type Nacos struct {
-	log    *zdpgo_log.Log              // 日志对象
+	log    *zdpgo_zap.Zap              // 日志对象
 	config *NacosConfig                // 配置对象
 	client config_client.IConfigClient // nacos配置客户端对象
 }
@@ -23,6 +23,8 @@ type NacosConfig struct {
 	Host        string // nacos主机地址
 	Port        uint16 // nacos端口号
 	NamespaceID string // 名称空间id
+	Username    string // 用户名
+	Password    string // 密码
 }
 
 func New(config NacosConfig) *Nacos {
@@ -32,11 +34,12 @@ func New(config NacosConfig) *Nacos {
 	if config.LogFilePath == "" {
 		config.LogFilePath = "zdpgo_nacos.log"
 	}
-	l := zdpgo_log.New(zdpgo_log.LogConfig{
-		Debug: config.Debug,
-		Path:  config.LogFilePath,
+	n.log = zdpgo_zap.New(zdpgo_zap.ZapConfig{
+		Debug:        config.Debug,
+		OpenGlobal:   false,
+		OpenFileName: false,
+		LogFilePath:  config.LogFilePath,
 	})
-	n.log = l
 
 	// 校验参数
 	if config.Host == "" {
@@ -46,6 +49,12 @@ func New(config NacosConfig) *Nacos {
 	if config.Port == 0 {
 		n.log.Warning("nacos端口号Port为空，将使用默认值：8848")
 		config.Port = 8848
+	}
+	if config.Username == "" {
+		config.Username = "nacos"
+	}
+	if config.Password == "" {
+		config.Password = "nacos"
 	}
 	if config.NamespaceID == "" {
 		n.log.Panic("名称空间不能为空！")
