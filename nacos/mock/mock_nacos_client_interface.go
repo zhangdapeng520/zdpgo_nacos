@@ -23,7 +23,7 @@ package mock
 import (
 	reflect "reflect"
 
-	gomock "github.com/golang/mock/gomock"
+	gomock "github.com/zhangdapeng520/zdpgo_nacos/mock/gomock"
 	constant "github.com/zhangdapeng520/zdpgo_nacos/nacos/common/constant"
 	http_agent "github.com/zhangdapeng520/zdpgo_nacos/nacos/common/http_agent"
 )
