@@ -8,9 +8,9 @@ import (
 func prepareNacos() *Nacos {
 	n := New(NacosConfig{
 		Debug:       true,
-		Host:        "192.168.33.101",
+		Host:        "127.0.0.1",
 		Port:        8848,
-		NamespaceID: "c8c2e715-a3ce-43d8-844b-4f4be4391785",
+		NamespaceID: "283df317-fa59-46db-9cac-838970599ef4",
 	})
 	return n
 }
@@ -31,7 +31,7 @@ func TestNacos_InitClient(t *testing.T) {
 // 测试获取配置内容
 func TestNacos_GetContent(t *testing.T) {
 	n := prepareNacos()
-	content := n.GetContent("zdpgo_micro_service_user.json", "dev")
+	content := n.GetContent("user_web.json", "dev")
 	fmt.Println(content)
 	fmt.Println(string(content))
 }
@@ -39,7 +39,7 @@ func TestNacos_GetContent(t *testing.T) {
 // 测试解析json配置
 func TestNacos_ParseJsonConfig(t *testing.T) {
 	n := prepareNacos()
-	content := n.GetContent("zdpgo_micro_service_user.json", "dev")
+	content := n.GetContent("user_web.json", "dev")
 
 	config := ServiceConfig{}
 	n.ParseJsonConfig(&config, content)

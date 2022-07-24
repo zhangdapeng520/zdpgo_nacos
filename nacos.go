@@ -2,17 +2,15 @@ package zdpgo_nacos
 
 import (
 	"encoding/json"
-	"github.com/zhangdapeng520/zdpgo_zap"
-
-	"github.com/nacos-group/nacos-sdk-go/clients"
-	"github.com/nacos-group/nacos-sdk-go/clients/config_client"
-	"github.com/nacos-group/nacos-sdk-go/common/constant"
-	"github.com/nacos-group/nacos-sdk-go/vo"
+	"fmt"
+	"github.com/zhangdapeng520/zdpgo_nacos/nacos/clients"
+	"github.com/zhangdapeng520/zdpgo_nacos/nacos/clients/config_client"
+	"github.com/zhangdapeng520/zdpgo_nacos/nacos/common/constant"
+	"github.com/zhangdapeng520/zdpgo_nacos/nacos/vo"
 )
 
 // Nacos nacos核心对象
 type Nacos struct {
-	log    *zdpgo_zap.Zap              // 日志对象
 	config *NacosConfig                // 配置对象
 	client config_client.IConfigClient // nacos配置客户端对象
 }
@@ -30,24 +28,11 @@ type NacosConfig struct {
 func New(config NacosConfig) *Nacos {
 	n := Nacos{}
 
-	// 初始化日志
-	if config.LogFilePath == "" {
-		config.LogFilePath = "zdpgo_nacos.log"
-	}
-	n.log = zdpgo_zap.New(zdpgo_zap.ZapConfig{
-		Debug:        config.Debug,
-		OpenGlobal:   false,
-		OpenFileName: false,
-		LogFilePath:  config.LogFilePath,
-	})
-
 	// 校验参数
 	if config.Host == "" {
-		n.log.Warning("nacos主机地址Host为空，将使用默认值：127.0.0.1")
 		n.config.Host = "127.0.0.1"
 	}
 	if config.Port == 0 {
-		n.log.Warning("nacos端口号Port为空，将使用默认值：8848")
 		config.Port = 8848
 	}
 	if config.Username == "" {
@@ -57,7 +42,7 @@ func New(config NacosConfig) *Nacos {
 		config.Password = "nacos"
 	}
 	if config.NamespaceID == "" {
-		n.log.Panic("名称空间不能为空！")
+		panic("名称空间不能为空！")
 	}
 
 	// 配置
@@ -98,7 +83,7 @@ func (n *Nacos) initClient() {
 		"clientConfig":  cc,
 	})
 	if err != nil {
-		n.log.Error("获取nacos配置失败：", err.Error())
+		fmt.Println("获取nacos配置失败：", err.Error())
 	}
 
 	// 初始化客户端
@@ -110,13 +95,11 @@ func (n *Nacos) initClient() {
 // @param group 配置组名称
 // @return content 配置内容
 func (n *Nacos) GetContent(dataId, group string) (content string) {
-	n.log.Info("nacos配置组：", dataId, group)
 	content, err := n.client.GetConfig(vo.ConfigParam{
 		DataId: dataId,
 		Group:  group})
 
 	if err != nil {
-		n.log.Error("读取指定配置失败：", err)
 	}
 	return content
 }
@@ -128,7 +111,6 @@ func (n *Nacos) ParseJsonConfig(config interface{}, jsonContent string) {
 	//想要将一个json字符串转换成struct，需要去设置这个struct的tag
 	err := json.Unmarshal([]byte(jsonContent), &config)
 	if err != nil {
-		n.log.Error("解析json配置失败：", err)
 	}
 }
 
