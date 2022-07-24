@@ -24,7 +24,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pkg/errors"
+	errors "github.com/zhangdapeng520/zdpgo_nacos/pkg_errors"
 
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/clients/cache"
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/clients/nacos_client"

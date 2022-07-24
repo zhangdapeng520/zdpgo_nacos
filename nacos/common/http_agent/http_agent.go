@@ -20,7 +20,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/go-errors/errors"
+	"github.com/zhangdapeng520/zdpgo_nacos/errors"
 )
 
 type HttpAgent struct {

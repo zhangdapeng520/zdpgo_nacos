@@ -24,7 +24,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/go-errors/errors"
+	"github.com/zhangdapeng520/zdpgo_nacos/errors"
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/common/constant"
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/common/file"
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/model"
