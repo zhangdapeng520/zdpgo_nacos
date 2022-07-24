@@ -27,7 +27,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/aliyun/alibaba-cloud-sdk-go/services/kms"
+	"github.com/zhangdapeng520/zdpgo_nacos/kms"
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/clients/cache"
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/clients/nacos_client"
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/common/constant"
