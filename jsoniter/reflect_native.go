@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"unsafe"
 
-	"github.com/modern-go/reflect2"
+	"github.com/zhangdapeng520/zdpgo_nacos/reflect2"
 )
 
 const ptrSize = 32 << uintptr(^uintptr(0)>>63)

@@ -7,8 +7,8 @@ import (
 	"sync"
 	"unsafe"
 
-	"github.com/modern-go/concurrent"
-	"github.com/modern-go/reflect2"
+	"github.com/zhangdapeng520/zdpgo_nacos/concurrent"
+	"github.com/zhangdapeng520/zdpgo_nacos/reflect2"
 )
 
 // Config customize how the API should behave.

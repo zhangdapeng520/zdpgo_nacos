@@ -1,8 +1,8 @@
 package extra
 
 import (
-	"github.com/modern-go/reflect2"
 	"github.com/zhangdapeng520/zdpgo_nacos/jsoniter"
+	"github.com/zhangdapeng520/zdpgo_nacos/reflect2"
 	"unicode/utf8"
 	"unsafe"
 )

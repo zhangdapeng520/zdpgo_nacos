@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"unsafe"
 
-	"github.com/modern-go/reflect2"
+	"github.com/zhangdapeng520/zdpgo_nacos/reflect2"
 )
 
 // ValDecoder is an internal type registered to cache as needed.

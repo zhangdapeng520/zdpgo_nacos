@@ -22,11 +22,11 @@ import (
 	"sync/atomic"
 	"time"
 
-	nsema "github.com/toolkits/concurrent/semaphore"
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/clients/cache"
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/common/constant"
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/model"
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/util"
+	nsema "github.com/zhangdapeng520/zdpgo_nacos/toolkits_concurrent/semaphore"
 )
 
 type BeatReactor struct {

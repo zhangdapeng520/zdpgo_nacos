@@ -3,7 +3,7 @@ package jsoniter
 import (
 	"errors"
 	"fmt"
-	"github.com/modern-go/reflect2"
+	"github.com/zhangdapeng520/zdpgo_nacos/reflect2"
 	"io"
 	"reflect"
 	"strconv"
