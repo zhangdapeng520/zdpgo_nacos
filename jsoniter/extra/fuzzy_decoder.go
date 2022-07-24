@@ -1,13 +1,14 @@
-package responses
+package extra
 
 import (
 	"encoding/json"
 	"io"
 	"math"
-	"strconv"
+	"reflect"
 	"strings"
 	"unsafe"
 
+	"github.com/modern-go/reflect2"
 	"github.com/zhangdapeng520/zdpgo_nacos/jsoniter"
 )
 
@@ -15,24 +16,14 @@ const maxUint = ^uint(0)
 const maxInt = int(maxUint >> 1)
 const minInt = -maxInt - 1
 
-var jsonParser jsoniter.API
-
-func init() {
-	registerBetterFuzzyDecoder()
-	jsonParser = jsoniter.Config{
-		EscapeHTML:             true,
-		SortMapKeys:            true,
-		ValidateJsonRawMessage: true,
-		CaseSensitive:          true,
-	}.Froze()
-}
-
-func registerBetterFuzzyDecoder() {
-	jsoniter.RegisterTypeDecoder("string", &nullableFuzzyStringDecoder{})
-	jsoniter.RegisterTypeDecoder("bool", &fuzzyBoolDecoder{})
-	jsoniter.RegisterTypeDecoder("float32", &nullableFuzzyFloat32Decoder{})
-	jsoniter.RegisterTypeDecoder("float64", &nullableFuzzyFloat64Decoder{})
-	jsoniter.RegisterTypeDecoder("int", &nullableFuzzyIntegerDecoder{func(isFloat bool, ptr unsafe.Pointer, iter *jsoniter.Iterator) {
+// RegisterFuzzyDecoders decode input from PHP with tolerance.
+// It will handle string/number auto conversation, and treat empty [] as empty struct.
+func RegisterFuzzyDecoders() {
+	jsoniter.RegisterExtension(&tolerateEmptyArrayExtension{})
+	jsoniter.RegisterTypeDecoder("string", &fuzzyStringDecoder{})
+	jsoniter.RegisterTypeDecoder("float32", &fuzzyFloat32Decoder{})
+	jsoniter.RegisterTypeDecoder("float64", &fuzzyFloat64Decoder{})
+	jsoniter.RegisterTypeDecoder("int", &fuzzyIntegerDecoder{func(isFloat bool, ptr unsafe.Pointer, iter *jsoniter.Iterator) {
 		if isFloat {
 			val := iter.ReadFloat64()
 			if val > float64(maxInt) || val < float64(minInt) {
@@ -44,7 +35,7 @@ func registerBetterFuzzyDecoder() {
 			*((*int)(ptr)) = iter.ReadInt()
 		}
 	}})
-	jsoniter.RegisterTypeDecoder("uint", &nullableFuzzyIntegerDecoder{func(isFloat bool, ptr unsafe.Pointer, iter *jsoniter.Iterator) {
+	jsoniter.RegisterTypeDecoder("uint", &fuzzyIntegerDecoder{func(isFloat bool, ptr unsafe.Pointer, iter *jsoniter.Iterator) {
 		if isFloat {
 			val := iter.ReadFloat64()
 			if val > float64(maxUint) || val < 0 {
@@ -56,7 +47,7 @@ func registerBetterFuzzyDecoder() {
 			*((*uint)(ptr)) = iter.ReadUint()
 		}
 	}})
-	jsoniter.RegisterTypeDecoder("int8", &nullableFuzzyIntegerDecoder{func(isFloat bool, ptr unsafe.Pointer, iter *jsoniter.Iterator) {
+	jsoniter.RegisterTypeDecoder("int8", &fuzzyIntegerDecoder{func(isFloat bool, ptr unsafe.Pointer, iter *jsoniter.Iterator) {
 		if isFloat {
 			val := iter.ReadFloat64()
 			if val > float64(math.MaxInt8) || val < float64(math.MinInt8) {
@@ -68,7 +59,7 @@ func registerBetterFuzzyDecoder() {
 			*((*int8)(ptr)) = iter.ReadInt8()
 		}
 	}})
-	jsoniter.RegisterTypeDecoder("uint8", &nullableFuzzyIntegerDecoder{func(isFloat bool, ptr unsafe.Pointer, iter *jsoniter.Iterator) {
+	jsoniter.RegisterTypeDecoder("uint8", &fuzzyIntegerDecoder{func(isFloat bool, ptr unsafe.Pointer, iter *jsoniter.Iterator) {
 		if isFloat {
 			val := iter.ReadFloat64()
 			if val > float64(math.MaxUint8) || val < 0 {
@@ -80,7 +71,7 @@ func registerBetterFuzzyDecoder() {
 			*((*uint8)(ptr)) = iter.ReadUint8()
 		}
 	}})
-	jsoniter.RegisterTypeDecoder("int16", &nullableFuzzyIntegerDecoder{func(isFloat bool, ptr unsafe.Pointer, iter *jsoniter.Iterator) {
+	jsoniter.RegisterTypeDecoder("int16", &fuzzyIntegerDecoder{func(isFloat bool, ptr unsafe.Pointer, iter *jsoniter.Iterator) {
 		if isFloat {
 			val := iter.ReadFloat64()
 			if val > float64(math.MaxInt16) || val < float64(math.MinInt16) {
@@ -92,7 +83,7 @@ func registerBetterFuzzyDecoder() {
 			*((*int16)(ptr)) = iter.ReadInt16()
 		}
 	}})
-	jsoniter.RegisterTypeDecoder("uint16", &nullableFuzzyIntegerDecoder{func(isFloat bool, ptr unsafe.Pointer, iter *jsoniter.Iterator) {
+	jsoniter.RegisterTypeDecoder("uint16", &fuzzyIntegerDecoder{func(isFloat bool, ptr unsafe.Pointer, iter *jsoniter.Iterator) {
 		if isFloat {
 			val := iter.ReadFloat64()
 			if val > float64(math.MaxUint16) || val < 0 {
@@ -104,7 +95,7 @@ func registerBetterFuzzyDecoder() {
 			*((*uint16)(ptr)) = iter.ReadUint16()
 		}
 	}})
-	jsoniter.RegisterTypeDecoder("int32", &nullableFuzzyIntegerDecoder{func(isFloat bool, ptr unsafe.Pointer, iter *jsoniter.Iterator) {
+	jsoniter.RegisterTypeDecoder("int32", &fuzzyIntegerDecoder{func(isFloat bool, ptr unsafe.Pointer, iter *jsoniter.Iterator) {
 		if isFloat {
 			val := iter.ReadFloat64()
 			if val > float64(math.MaxInt32) || val < float64(math.MinInt32) {
@@ -116,7 +107,7 @@ func registerBetterFuzzyDecoder() {
 			*((*int32)(ptr)) = iter.ReadInt32()
 		}
 	}})
-	jsoniter.RegisterTypeDecoder("uint32", &nullableFuzzyIntegerDecoder{func(isFloat bool, ptr unsafe.Pointer, iter *jsoniter.Iterator) {
+	jsoniter.RegisterTypeDecoder("uint32", &fuzzyIntegerDecoder{func(isFloat bool, ptr unsafe.Pointer, iter *jsoniter.Iterator) {
 		if isFloat {
 			val := iter.ReadFloat64()
 			if val > float64(math.MaxUint32) || val < 0 {
@@ -128,7 +119,7 @@ func registerBetterFuzzyDecoder() {
 			*((*uint32)(ptr)) = iter.ReadUint32()
 		}
 	}})
-	jsoniter.RegisterTypeDecoder("int64", &nullableFuzzyIntegerDecoder{func(isFloat bool, ptr unsafe.Pointer, iter *jsoniter.Iterator) {
+	jsoniter.RegisterTypeDecoder("int64", &fuzzyIntegerDecoder{func(isFloat bool, ptr unsafe.Pointer, iter *jsoniter.Iterator) {
 		if isFloat {
 			val := iter.ReadFloat64()
 			if val > float64(math.MaxInt64) || val < float64(math.MinInt64) {
@@ -140,7 +131,7 @@ func registerBetterFuzzyDecoder() {
 			*((*int64)(ptr)) = iter.ReadInt64()
 		}
 	}})
-	jsoniter.RegisterTypeDecoder("uint64", &nullableFuzzyIntegerDecoder{func(isFloat bool, ptr unsafe.Pointer, iter *jsoniter.Iterator) {
+	jsoniter.RegisterTypeDecoder("uint64", &fuzzyIntegerDecoder{func(isFloat bool, ptr unsafe.Pointer, iter *jsoniter.Iterator) {
 		if isFloat {
 			val := iter.ReadFloat64()
 			if val > float64(math.MaxUint64) || val < 0 {
@@ -154,10 +145,36 @@ func registerBetterFuzzyDecoder() {
 	}})
 }
 
-type nullableFuzzyStringDecoder struct {
+type tolerateEmptyArrayExtension struct {
+	jsoniter.DummyExtension
 }
 
-func (decoder *nullableFuzzyStringDecoder) Decode(ptr unsafe.Pointer, iter *jsoniter.Iterator) {
+func (extension *tolerateEmptyArrayExtension) DecorateDecoder(typ reflect2.Type, decoder jsoniter.ValDecoder) jsoniter.ValDecoder {
+	if typ.Kind() == reflect.Struct || typ.Kind() == reflect.Map {
+		return &tolerateEmptyArrayDecoder{decoder}
+	}
+	return decoder
+}
+
+type tolerateEmptyArrayDecoder struct {
+	valDecoder jsoniter.ValDecoder
+}
+
+func (decoder *tolerateEmptyArrayDecoder) Decode(ptr unsafe.Pointer, iter *jsoniter.Iterator) {
+	if iter.WhatIsNext() == jsoniter.ArrayValue {
+		iter.Skip()
+		newIter := iter.Pool().BorrowIterator([]byte("{}"))
+		defer iter.Pool().ReturnIterator(newIter)
+		decoder.valDecoder.Decode(ptr, newIter)
+	} else {
+		decoder.valDecoder.Decode(ptr, iter)
+	}
+}
+
+type fuzzyStringDecoder struct {
+}
+
+func (decoder *fuzzyStringDecoder) Decode(ptr unsafe.Pointer, iter *jsoniter.Iterator) {
 	valueType := iter.WhatIsNext()
 	switch valueType {
 	case jsoniter.NumberValue:
@@ -166,58 +183,19 @@ func (decoder *nullableFuzzyStringDecoder) Decode(ptr unsafe.Pointer, iter *json
 		*((*string)(ptr)) = string(number)
 	case jsoniter.StringValue:
 		*((*string)(ptr)) = iter.ReadString()
-	case jsoniter.BoolValue:
-		*((*string)(ptr)) = strconv.FormatBool(iter.ReadBool())
 	case jsoniter.NilValue:
-		iter.ReadNil()
+		iter.Skip()
 		*((*string)(ptr)) = ""
 	default:
-		iter.ReportError("fuzzyStringDecoder", "not number or string or bool")
+		iter.ReportError("fuzzyStringDecoder", "not number or string")
 	}
 }
 
-type fuzzyBoolDecoder struct {
-}
-
-func (decoder *fuzzyBoolDecoder) Decode(ptr unsafe.Pointer, iter *jsoniter.Iterator) {
-	valueType := iter.WhatIsNext()
-	switch valueType {
-	case jsoniter.BoolValue:
-		*((*bool)(ptr)) = iter.ReadBool()
-	case jsoniter.NumberValue:
-		var number json.Number
-		iter.ReadVal(&number)
-		num, err := number.Int64()
-		if err != nil {
-			iter.ReportError("fuzzyBoolDecoder", "get value from json.number failed")
-		}
-		if num == 0 {
-			*((*bool)(ptr)) = false
-		} else {
-			*((*bool)(ptr)) = true
-		}
-	case jsoniter.StringValue:
-		strValue := strings.ToLower(iter.ReadString())
-		if strValue == "true" {
-			*((*bool)(ptr)) = true
-		} else if strValue == "false" || strValue == "" {
-			*((*bool)(ptr)) = false
-		} else {
-			iter.ReportError("fuzzyBoolDecoder", "unsupported bool value: "+strValue)
-		}
-	case jsoniter.NilValue:
-		iter.ReadNil()
-		*((*bool)(ptr)) = false
-	default:
-		iter.ReportError("fuzzyBoolDecoder", "not number or string or nil")
-	}
-}
-
-type nullableFuzzyIntegerDecoder struct {
+type fuzzyIntegerDecoder struct {
 	fun func(isFloat bool, ptr unsafe.Pointer, iter *jsoniter.Iterator)
 }
 
-func (decoder *nullableFuzzyIntegerDecoder) Decode(ptr unsafe.Pointer, iter *jsoniter.Iterator) {
+func (decoder *fuzzyIntegerDecoder) Decode(ptr unsafe.Pointer, iter *jsoniter.Iterator) {
 	valueType := iter.WhatIsNext()
 	var str string
 	switch valueType {
@@ -227,10 +205,6 @@ func (decoder *nullableFuzzyIntegerDecoder) Decode(ptr unsafe.Pointer, iter *jso
 		str = string(number)
 	case jsoniter.StringValue:
 		str = iter.ReadString()
-		// support empty string
-		if str == "" {
-			str = "0"
-		}
 	case jsoniter.BoolValue:
 		if iter.ReadBool() {
 			str = "1"
@@ -238,10 +212,13 @@ func (decoder *nullableFuzzyIntegerDecoder) Decode(ptr unsafe.Pointer, iter *jso
 			str = "0"
 		}
 	case jsoniter.NilValue:
-		iter.ReadNil()
+		iter.Skip()
 		str = "0"
 	default:
 		iter.ReportError("fuzzyIntegerDecoder", "not number or string")
+	}
+	if len(str) == 0 {
+		str = "0"
 	}
 	newIter := iter.Pool().BorrowIterator([]byte(str))
 	defer iter.Pool().ReturnIterator(newIter)
@@ -252,10 +229,10 @@ func (decoder *nullableFuzzyIntegerDecoder) Decode(ptr unsafe.Pointer, iter *jso
 	}
 }
 
-type nullableFuzzyFloat32Decoder struct {
+type fuzzyFloat32Decoder struct {
 }
 
-func (decoder *nullableFuzzyFloat32Decoder) Decode(ptr unsafe.Pointer, iter *jsoniter.Iterator) {
+func (decoder *fuzzyFloat32Decoder) Decode(ptr unsafe.Pointer, iter *jsoniter.Iterator) {
 	valueType := iter.WhatIsNext()
 	var str string
 	switch valueType {
@@ -263,11 +240,6 @@ func (decoder *nullableFuzzyFloat32Decoder) Decode(ptr unsafe.Pointer, iter *jso
 		*((*float32)(ptr)) = iter.ReadFloat32()
 	case jsoniter.StringValue:
 		str = iter.ReadString()
-		// support empty string
-		if str == "" {
-			*((*float32)(ptr)) = 0
-			return
-		}
 		newIter := iter.Pool().BorrowIterator([]byte(str))
 		defer iter.Pool().ReturnIterator(newIter)
 		*((*float32)(ptr)) = newIter.ReadFloat32()
@@ -282,17 +254,17 @@ func (decoder *nullableFuzzyFloat32Decoder) Decode(ptr unsafe.Pointer, iter *jso
 			*((*float32)(ptr)) = 0
 		}
 	case jsoniter.NilValue:
-		iter.ReadNil()
+		iter.Skip()
 		*((*float32)(ptr)) = 0
 	default:
-		iter.ReportError("nullableFuzzyFloat32Decoder", "not number or string")
+		iter.ReportError("fuzzyFloat32Decoder", "not number or string")
 	}
 }
 
-type nullableFuzzyFloat64Decoder struct {
+type fuzzyFloat64Decoder struct {
 }
 
-func (decoder *nullableFuzzyFloat64Decoder) Decode(ptr unsafe.Pointer, iter *jsoniter.Iterator) {
+func (decoder *fuzzyFloat64Decoder) Decode(ptr unsafe.Pointer, iter *jsoniter.Iterator) {
 	valueType := iter.WhatIsNext()
 	var str string
 	switch valueType {
@@ -300,11 +272,6 @@ func (decoder *nullableFuzzyFloat64Decoder) Decode(ptr unsafe.Pointer, iter *jso
 		*((*float64)(ptr)) = iter.ReadFloat64()
 	case jsoniter.StringValue:
 		str = iter.ReadString()
-		// support empty string
-		if str == "" {
-			*((*float64)(ptr)) = 0
-			return
-		}
 		newIter := iter.Pool().BorrowIterator([]byte(str))
 		defer iter.Pool().ReturnIterator(newIter)
 		*((*float64)(ptr)) = newIter.ReadFloat64()
@@ -319,10 +286,9 @@ func (decoder *nullableFuzzyFloat64Decoder) Decode(ptr unsafe.Pointer, iter *jso
 			*((*float64)(ptr)) = 0
 		}
 	case jsoniter.NilValue:
-		// support empty string
-		iter.ReadNil()
+		iter.Skip()
 		*((*float64)(ptr)) = 0
 	default:
-		iter.ReportError("nullableFuzzyFloat64Decoder", "not number or string")
+		iter.ReportError("fuzzyFloat64Decoder", "not number or string")
 	}
 }
