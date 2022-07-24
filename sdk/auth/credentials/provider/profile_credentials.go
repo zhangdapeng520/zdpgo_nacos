@@ -10,7 +10,7 @@ import (
 	"github.com/zhangdapeng520/zdpgo_nacos/sdk/auth"
 	"github.com/zhangdapeng520/zdpgo_nacos/sdk/auth/credentials"
 
-	ini "gopkg.in/ini.v1"
+	"github.com/zhangdapeng520/zdpgo_nacos/ini"
 )
 
 type ProfileProvider struct {

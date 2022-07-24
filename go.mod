@@ -10,11 +10,9 @@ require (
 	github.com/modern-go/reflect2 v0.0.0-20180701023420-4b7aa43c6742
 	github.com/pkg/errors v0.9.1
 	github.com/toolkits/concurrent v0.0.0-20150624120057-a4371d70e3e3
-	gopkg.in/ini.v1 v1.42.0
 )
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/smartystreets/goconvey v1.7.2 // indirect
 	github.com/stretchr/testify v1.4.0 // indirect
 )
