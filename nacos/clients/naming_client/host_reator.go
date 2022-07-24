@@ -23,7 +23,6 @@ import (
 	"time"
 
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/clients/cache"
-	"github.com/zhangdapeng520/zdpgo_nacos/nacos/common/logger"
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/model"
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/util"
 )
@@ -84,18 +83,12 @@ func (hr *HostReactor) ProcessServiceJson(result string) {
 	if ok && !hr.updateCacheWhenEmpty {
 		//if instance list is empty,not to update cache
 		if service.Hosts == nil || len(service.Hosts) == 0 {
-			logger.Errorf("do not have useful host, ignore it, name:%s", service.Name)
 			return
 		}
 	}
 	hr.updateTimeMap.Set(cacheKey, uint64(util.CurrentMillis()))
 	hr.serviceInfoMap.Set(cacheKey, *service)
 	if !ok || ok && !reflect.DeepEqual(service.Hosts, oldDomain.(model.Service).Hosts) {
-		if !ok {
-			logger.Info("service not found in cache " + cacheKey)
-		} else {
-			logger.Info("service key:%s was updated to:%s", cacheKey, util.ToJsonString(service))
-		}
 		cache.WriteServicesToFile(*service, hr.cacheDir)
 		hr.subCallback.ServiceChanged(service)
 	}
@@ -118,20 +111,14 @@ func (hr *HostReactor) GetAllServiceInfo(nameSpace, groupName string, pageNo, pa
 	data := model.ServiceList{}
 	result, err := hr.serviceProxy.GetAllServiceInfoList(nameSpace, groupName, pageNo, pageSize)
 	if err != nil {
-		logger.Errorf("GetAllServiceInfoList return error!nameSpace:%s groupName:%s pageNo:%d, pageSize:%d err:%+v",
-			nameSpace, groupName, pageNo, pageSize, err)
 		return data
 	}
 	if result == "" {
-		logger.Errorf("GetAllServiceInfoList result is empty!nameSpace:%s  groupName:%s pageNo:%d, pageSize:%d",
-			nameSpace, groupName, pageNo, pageSize)
 		return data
 	}
 
 	err = json.Unmarshal([]byte(result), &data)
 	if err != nil {
-		logger.Errorf("GetAllServiceInfoList result json.Unmarshal error!nameSpace:%s groupName:%s pageNo:%d, pageSize:%d",
-			nameSpace, groupName, pageNo, pageSize)
 		return data
 	}
 	return data
@@ -141,11 +128,9 @@ func (hr *HostReactor) updateServiceNow(serviceName, clusters string) {
 	result, err := hr.serviceProxy.QueryList(serviceName, clusters, hr.pushReceiver.port, false)
 
 	if err != nil {
-		logger.Errorf("QueryList return error!serviceName:%s cluster:%s err:%+v", serviceName, clusters, err)
 		return
 	}
 	if result == "" {
-		logger.Errorf("QueryList result is empty!serviceName:%s cluster:%s", serviceName, clusters)
 		return
 	}
 	hr.ProcessServiceJson(result)

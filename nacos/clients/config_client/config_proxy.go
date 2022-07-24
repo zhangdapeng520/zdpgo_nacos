@@ -25,7 +25,6 @@ import (
 
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/common/constant"
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/common/http_agent"
-	"github.com/zhangdapeng520/zdpgo_nacos/nacos/common/logger"
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/common/nacos_server"
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/model"
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/util"
@@ -177,7 +176,7 @@ func (cp *ConfigProxy) ListenConfig(params map[string]string, isInitializing boo
 	if len(tenant) > 0 {
 		params["tenant"] = tenant
 	}
-	logger.Infof("[client.ListenConfig] request params:%+v header:%+v \n", params, headers)
+
 	// In order to prevent the server from handling the delay of the client's long task,
 	// increase the client's read timeout to avoid this problem.
 	timeout := listenInterval + listenInterval/10

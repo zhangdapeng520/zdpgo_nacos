@@ -22,13 +22,11 @@ import (
 	"io/ioutil"
 	"os"
 	"runtime"
-	"strconv"
 	"strings"
 
 	"github.com/go-errors/errors"
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/common/constant"
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/common/file"
-	"github.com/zhangdapeng520/zdpgo_nacos/nacos/common/logger"
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/model"
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/util"
 )
@@ -49,7 +47,7 @@ func WriteServicesToFile(service model.Service, cacheDir string) {
 
 	err := ioutil.WriteFile(domFileName, sb, 0666)
 	if err != nil {
-		logger.Errorf("failed to write name cache:%s ,value:%s ,err:%+v", domFileName, string(sb), err)
+
 	}
 
 }
@@ -57,7 +55,7 @@ func WriteServicesToFile(service model.Service, cacheDir string) {
 func ReadServicesFromFile(cacheDir string) map[string]model.Service {
 	files, err := ioutil.ReadDir(cacheDir)
 	if err != nil {
-		logger.Errorf("read cacheDir:%s failed!err:%+v", cacheDir, err)
+
 		return nil
 	}
 	serviceMap := map[string]model.Service{}
@@ -65,7 +63,7 @@ func ReadServicesFromFile(cacheDir string) map[string]model.Service {
 		fileName := GetFileName(f.Name(), cacheDir)
 		b, err := ioutil.ReadFile(fileName)
 		if err != nil {
-			logger.Errorf("failed to read name cache file:%s,err:%+v ", fileName, err)
+
 			continue
 		}
 
@@ -79,7 +77,6 @@ func ReadServicesFromFile(cacheDir string) map[string]model.Service {
 		serviceMap[f.Name()] = *service
 	}
 
-	logger.Info("finish loading name cache, total: " + strconv.Itoa(len(files)))
 	return serviceMap
 }
 
@@ -88,7 +85,7 @@ func WriteConfigToFile(cacheKey string, cacheDir string, content string) {
 	fileName := GetFileName(cacheKey, cacheDir)
 	err := ioutil.WriteFile(fileName, []byte(content), 0666)
 	if err != nil {
-		logger.Errorf("failed to write config  cache:%s ,value:%s ,err:%+v", fileName, content, err)
+
 	}
 }
 

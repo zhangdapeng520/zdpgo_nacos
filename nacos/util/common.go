@@ -24,7 +24,6 @@ import (
 	"time"
 
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/common/constant"
-	"github.com/zhangdapeng520/zdpgo_nacos/nacos/common/logger"
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/model"
 )
 
@@ -36,11 +35,11 @@ func JsonToService(result string) *model.Service {
 	var service model.Service
 	err := json.Unmarshal([]byte(result), &service)
 	if err != nil {
-		logger.Errorf("failed to unmarshal json string:%s err:%+v", result, err)
+
 		return nil
 	}
 	if len(service.Hosts) == 0 {
-		logger.Warnf("instance list is empty,json string:%s", result)
+
 	}
 	return &service
 
@@ -91,7 +90,7 @@ func LocalIP() string {
 	}
 
 	if localIP != "" {
-		logger.Infof("Local IP:%s", localIP)
+
 	}
 
 	return localIP
@@ -119,7 +118,7 @@ func getFaces() ([]net.Addr, error) {
 
 	interfaces, err := net.Interfaces()
 	if err != nil {
-		logger.Errorf("get Interfaces failed,err:%+v", err)
+
 		return nil, err
 	}
 
@@ -133,7 +132,7 @@ func getFaces() ([]net.Addr, error) {
 
 		addresses, err := iface.Addrs()
 		if err != nil {
-			logger.Errorf("get InterfaceAddress failed,err:%+v", err)
+
 			return nil, err
 		}
 
@@ -157,7 +156,7 @@ func GetDurationWithDefault(metadata map[string]string, key string, defaultDurat
 	if ok {
 		value, err := strconv.ParseInt(data, 10, 64)
 		if err != nil {
-			logger.Errorf("key:%s is not a number", key)
+
 			return defaultDuration
 		}
 		return time.Duration(value)

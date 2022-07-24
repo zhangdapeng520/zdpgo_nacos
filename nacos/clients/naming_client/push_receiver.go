@@ -26,7 +26,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/zhangdapeng520/zdpgo_nacos/nacos/common/logger"
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/util"
 )
 
@@ -57,13 +56,13 @@ func NewPushReceiver(hostReactor *HostReactor) *PushReceiver {
 func (us *PushReceiver) tryListen() (*net.UDPConn, bool) {
 	addr, err := net.ResolveUDPAddr("udp", us.host+":"+strconv.Itoa(us.port))
 	if err != nil {
-		logger.Errorf("can't resolve address,err: %+v", err)
+
 		return nil, false
 	}
 
 	conn, err := net.ListenUDP("udp", addr)
 	if err != nil {
-		logger.Errorf("error listening %s:%d,err:%+v", us.host, us.port, err)
+
 		return nil, false
 	}
 
@@ -80,12 +79,12 @@ func (us *PushReceiver) getConn() *net.UDPConn {
 
 		if ok {
 			conn = conn1
-			logger.Infof("udp server start, port: " + strconv.Itoa(port))
+
 			return conn
 		}
 
 		if !ok && i == 2 {
-			logger.Errorf("failed to start udp server after trying 3 times.")
+
 		}
 	}
 	return nil
@@ -118,17 +117,16 @@ func (us *PushReceiver) handleClient(conn *net.UDPConn) {
 	data := make([]byte, 4024)
 	n, remoteAddr, err := conn.ReadFromUDP(data)
 	if err != nil {
-		logger.Errorf("failed to read UDP msg because of %+v", err)
+
 		return
 	}
 
 	s := TryDecompressData(data[:n])
-	logger.Info("receive push: "+s+" from: ", remoteAddr)
 
 	var pushData PushData
 	err1 := json.Unmarshal([]byte(s), &pushData)
 	if err1 != nil {
-		logger.Infof("failed to process push data.err:%+v", err1)
+
 		return
 	}
 	ack := make(map[string]string)
@@ -151,9 +149,9 @@ func (us *PushReceiver) handleClient(conn *net.UDPConn) {
 	}
 
 	bs, _ := json.Marshal(ack)
-	c, err := conn.WriteToUDP(bs, remoteAddr)
+	_, err = conn.WriteToUDP(bs, remoteAddr)
 	if err != nil {
-		logger.Errorf("WriteToUDP failed,return:%d,err:%+v", c, err)
+
 	}
 }
 
@@ -165,7 +163,7 @@ func TryDecompressData(data []byte) string {
 	reader, err := gzip.NewReader(bytes.NewReader(data))
 
 	if err != nil {
-		logger.Errorf("failed to decompress gzip data,err:%+v", err)
+
 		return ""
 	}
 
@@ -173,7 +171,7 @@ func TryDecompressData(data []byte) string {
 	bs, err := ioutil.ReadAll(reader)
 
 	if err != nil {
-		logger.Errorf("failed to decompress gzip data,err:%+v", err)
+
 		return ""
 	}
 

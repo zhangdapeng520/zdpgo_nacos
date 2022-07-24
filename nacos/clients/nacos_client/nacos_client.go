@@ -25,7 +25,6 @@ import (
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/common/constant"
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/common/file"
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/common/http_agent"
-	"github.com/zhangdapeng520/zdpgo_nacos/nacos/common/logger"
 )
 
 type NacosClient struct {
@@ -84,7 +83,6 @@ func (client *NacosClient) SetClientConfig(config constant.ClientConfig) (err er
 		}
 	}
 
-	logger.Infof("logDir:<%s>   cacheDir:<%s>", config.LogDir, config.CacheDir)
 	client.clientConfig = config
 	client.clientConfigValid = true
 

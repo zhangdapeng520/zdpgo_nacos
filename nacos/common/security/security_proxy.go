@@ -28,7 +28,6 @@ import (
 
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/common/constant"
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/common/http_agent"
-	"github.com/zhangdapeng520/zdpgo_nacos/nacos/common/logger"
 )
 
 type AuthClient struct {
@@ -81,7 +80,7 @@ func (ac *AuthClient) AutoRefresh() {
 			case <-timer.C:
 				_, err := ac.Login()
 				if err != nil {
-					logger.Errorf("login has error %+v", err)
+
 				}
 				timer.Reset(time.Second * time.Duration(ac.tokenTtl-ac.tokenRefreshWindow))
 			}

@@ -33,7 +33,6 @@ import (
 
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/common/constant"
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/common/http_agent"
-	"github.com/zhangdapeng520/zdpgo_nacos/nacos/common/logger"
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/common/nacos_error"
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/common/security"
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/inner/uuid"
@@ -72,7 +71,7 @@ func NewNacosServer(serverList []constant.ServerConfig, clientCfg constant.Clien
 	_, err := securityLogin.Login()
 
 	if err != nil {
-		logger.Errorf("login has error %+v", err)
+
 	}
 
 	securityLogin.AutoRefresh()
@@ -191,7 +190,7 @@ func (server *NacosServer) ReqConfigApi(api string, params map[string]string, he
 			if err == nil {
 				return result, nil
 			}
-			logger.Errorf("api<%s>,method:<%s>, params:<%s>, call domain error:<%+v> , result:<%s>", api, method, util.ToJsonString(params), err, result)
+
 		}
 		return "", err
 	} else {
@@ -202,7 +201,7 @@ func (server *NacosServer) ReqConfigApi(api string, params map[string]string, he
 			if err == nil {
 				return result, nil
 			}
-			logger.Errorf("[ERROR] api<%s>,method:<%s>, params:<%s>, call domain error:<%+v> , result:<%s> \n", api, method, util.ToJsonString(params), err, result)
+
 			index = (index + i) % len(srvs)
 		}
 		return "", err
@@ -224,7 +223,7 @@ func (server *NacosServer) ReqApi(api string, params map[string]string, method s
 			if err == nil {
 				return result, nil
 			}
-			logger.Errorf("api<%s>,method:<%s>, params:<%s>, call domain error:<%+v> , result:<%s>", api, method, util.ToJsonString(params), err, result)
+
 		}
 		return "", errors.New("retry " + strconv.Itoa(constant.REQUEST_DOMAIN_RETRY_TIME) + " times request failed!")
 	} else {
@@ -235,7 +234,7 @@ func (server *NacosServer) ReqApi(api string, params map[string]string, method s
 			if err == nil {
 				return result, nil
 			}
-			logger.Errorf("api<%s>,method:<%s>, params:<%s>, call domain error:<%+v> , result:<%s>", api, method, util.ToJsonString(params), err, result)
+
 			index = (index + i) % len(srvs)
 		}
 		return "", errors.New("retry " + strconv.Itoa(constant.REQUEST_DOMAIN_RETRY_TIME) + " times request failed!")
@@ -265,7 +264,6 @@ func (server *NacosServer) refreshServerSrvIfNeed() {
 	urlString := "http://" + server.endpoint + "/nacos/serverlist"
 	result := server.httpAgent.RequestOnlyResult(http.MethodGet, urlString, nil, server.timeoutMs, nil)
 	list = strings.Split(result, "\n")
-	logger.Infof("http nacos server list: <%s>", result)
 
 	var servers []constant.ServerConfig
 	contextPath := server.contextPath
@@ -280,7 +278,7 @@ func (server *NacosServer) refreshServerSrvIfNeed() {
 			if len(splitLine) == 2 {
 				port, err = strconv.Atoi(splitLine[1])
 				if err != nil {
-					logger.Errorf("get port from server:<%s>  error: <%+v>", line, err)
+
 					continue
 				}
 			}
@@ -291,7 +289,7 @@ func (server *NacosServer) refreshServerSrvIfNeed() {
 	if len(servers) > 0 {
 		if !reflect.DeepEqual(server.serverList, servers) {
 			server.Lock()
-			logger.Infof("server list is updated, old: <%v>,new:<%v>", server.serverList, servers)
+
 			server.serverList = servers
 			server.lastSrvRefTime = util.CurrentMillis()
 			server.Unlock()

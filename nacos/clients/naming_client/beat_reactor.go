@@ -25,7 +25,6 @@ import (
 	nsema "github.com/toolkits/concurrent/semaphore"
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/clients/cache"
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/common/constant"
-	"github.com/zhangdapeng520/zdpgo_nacos/nacos/common/logger"
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/model"
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/util"
 )
@@ -62,7 +61,7 @@ func buildKey(serviceName string, ip string, port uint64) string {
 }
 
 func (br *BeatReactor) AddBeatInfo(serviceName string, beatInfo model.BeatInfo) {
-	logger.Infof("adding beat: <%s> to beat map", util.ToJsonString(beatInfo))
+
 	k := buildKey(serviceName, beatInfo.Ip, beatInfo.Port)
 	defer br.mux.Unlock()
 	br.mux.Lock()
@@ -76,7 +75,7 @@ func (br *BeatReactor) AddBeatInfo(serviceName string, beatInfo model.BeatInfo) 
 }
 
 func (br *BeatReactor) RemoveBeatInfo(serviceName string, ip string, port uint64) {
-	logger.Infof("remove beat: %s@%s:%d from beat map", serviceName, ip, port)
+
 	k := buildKey(serviceName, ip, port)
 	defer br.mux.Unlock()
 	br.mux.Lock()
@@ -93,7 +92,7 @@ func (br *BeatReactor) sendInstanceBeat(k string, beatInfo *model.BeatInfo) {
 		br.beatThreadSemaphore.Acquire()
 		//如果当前实例注销，则进行停止心跳
 		if atomic.LoadInt32(&beatInfo.State) == int32(model.StateShutdown) {
-			logger.Infof("instance[%s] stop heartBeating", k)
+
 			br.beatThreadSemaphore.Release()
 			return
 		}
@@ -101,7 +100,7 @@ func (br *BeatReactor) sendInstanceBeat(k string, beatInfo *model.BeatInfo) {
 		//进行心跳通信
 		beatInterval, err := br.serviceProxy.SendBeat(*beatInfo)
 		if err != nil {
-			logger.Errorf("beat to server return error:%+v", err)
+
 			br.beatThreadSemaphore.Release()
 			t := time.NewTimer(beatInfo.Period)
 			<-t.C

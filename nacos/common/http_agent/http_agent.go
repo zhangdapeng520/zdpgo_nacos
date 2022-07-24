@@ -21,8 +21,6 @@ import (
 	"net/http"
 
 	"github.com/go-errors/errors"
-	"github.com/zhangdapeng520/zdpgo_nacos/nacos/common/logger"
-	"github.com/zhangdapeng520/zdpgo_nacos/nacos/util"
 )
 
 type HttpAgent struct {
@@ -50,20 +48,20 @@ func (agent *HttpAgent) RequestOnlyResult(method string, path string, header htt
 		response, err = agent.Delete(path, header, timeoutMs, params)
 		break
 	default:
-		logger.Errorf("request method[%s], path[%s],header:[%s],params:[%s], not avaliable method ", method, path, util.ToJsonString(header), util.ToJsonString(params))
+
 	}
 	if err != nil {
-		logger.Errorf("request method[%s],request path[%s],header:[%s],params:[%s],err:%+v", method, path, util.ToJsonString(header), util.ToJsonString(params), err)
+
 		return ""
 	}
 	if response.StatusCode != 200 {
-		logger.Errorf("request method[%s],request path[%s],header:[%s],params:[%s],status code error:%d", method, path, util.ToJsonString(header), util.ToJsonString(params), response.StatusCode)
+
 		return ""
 	}
 	bytes, errRead := ioutil.ReadAll(response.Body)
 	defer response.Body.Close()
 	if errRead != nil {
-		logger.Errorf("request method[%s],request path[%s],header:[%s],params:[%s],read error:%+v", method, path, util.ToJsonString(header), util.ToJsonString(params), errRead)
+
 		return ""
 	}
 	return string(bytes)
@@ -86,7 +84,7 @@ func (agent *HttpAgent) Request(method string, path string, header http.Header, 
 		return
 	default:
 		err = errors.New("not available method")
-		logger.Errorf("request method[%s], path[%s],header:[%s],params:[%s], not available method ", method, path, util.ToJsonString(header), util.ToJsonString(params))
+
 	}
 	return
 }

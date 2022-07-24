@@ -20,7 +20,6 @@ import (
 	"errors"
 
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/clients/cache"
-	"github.com/zhangdapeng520/zdpgo_nacos/nacos/common/logger"
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/model"
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/util"
 )
@@ -36,7 +35,7 @@ func NewSubscribeCallback() SubscribeCallback {
 }
 
 func (ed *SubscribeCallback) AddCallbackFuncs(serviceName string, clusters string, callbackFunc *func(services []model.SubscribeService, err error)) {
-	logger.Info("adding " + serviceName + " with " + clusters + " to listener map")
+
 	key := util.GetServiceCacheKey(serviceName, clusters)
 	var funcs []*func(services []model.SubscribeService, err error)
 	old, ok := ed.callbackFuncsMap.Get(key)
@@ -48,7 +47,7 @@ func (ed *SubscribeCallback) AddCallbackFuncs(serviceName string, clusters strin
 }
 
 func (ed *SubscribeCallback) RemoveCallbackFuncs(serviceName string, clusters string, callbackFunc *func(services []model.SubscribeService, err error)) {
-	logger.Info("removing " + serviceName + " with " + clusters + " to listener map")
+
 	key := util.GetServiceCacheKey(serviceName, clusters)
 	funcs, ok := ed.callbackFuncsMap.Get(key)
 	if ok && funcs != nil {

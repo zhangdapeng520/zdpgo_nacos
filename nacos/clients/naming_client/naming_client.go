@@ -29,7 +29,6 @@ import (
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/clients/cache"
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/clients/nacos_client"
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/common/constant"
-	"github.com/zhangdapeng520/zdpgo_nacos/nacos/common/logger"
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/model"
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/util"
 	"github.com/zhangdapeng520/zdpgo_nacos/nacos/vo"
@@ -67,20 +66,6 @@ func NewNamingClient(nc nacos_client.INacosClient) (NamingClient, error) {
 	if err != nil {
 		return naming, err
 	}
-	loggerConfig := logger.Config{
-		Level:        clientConfig.LogLevel,
-		OutputPath:   clientConfig.LogDir,
-		RotationTime: clientConfig.RotateTime,
-		MaxAge:       clientConfig.MaxAge,
-	}
-	if clientConfig.LogSampling != nil {
-		loggerConfig.Sampling = &logger.SamplingConfig{
-			Initial:    clientConfig.LogSampling.Initial,
-			Thereafter: clientConfig.LogSampling.Thereafter,
-			Tick:       clientConfig.LogSampling.Tick,
-		}
-	}
-	err = logger.InitLogger(loggerConfig)
 	if err != nil {
 		return naming, err
 	}
