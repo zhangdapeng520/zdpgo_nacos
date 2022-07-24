@@ -21,10 +21,10 @@ import (
 	"strings"
 	"time"
 
+	jmespath "github.com/zhangdapeng520/zdpgo_nacos/jmespath"
 	"github.com/zhangdapeng520/zdpgo_nacos/sdk/auth/credentials"
 	"github.com/zhangdapeng520/zdpgo_nacos/sdk/requests"
 	"github.com/zhangdapeng520/zdpgo_nacos/sdk/responses"
-	jmespath "github.com/jmespath/go-jmespath"
 )
 
 var securityCredURL = "http://100.100.100.200/latest/meta-data/ram/security-credentials/"

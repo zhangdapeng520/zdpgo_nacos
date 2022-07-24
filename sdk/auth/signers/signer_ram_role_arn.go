@@ -21,11 +21,11 @@ import (
 	"strconv"
 	"time"
 
+	jmespath "github.com/zhangdapeng520/zdpgo_nacos/jmespath"
 	"github.com/zhangdapeng520/zdpgo_nacos/sdk/auth/credentials"
 	"github.com/zhangdapeng520/zdpgo_nacos/sdk/errors"
 	"github.com/zhangdapeng520/zdpgo_nacos/sdk/requests"
 	"github.com/zhangdapeng520/zdpgo_nacos/sdk/responses"
-	jmespath "github.com/jmespath/go-jmespath"
 )
 
 const (

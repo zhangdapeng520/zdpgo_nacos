@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/jmespath/go-jmespath"
+	"github.com/zhangdapeng520/zdpgo_nacos/jmespath"
 )
 
 type LocalGlobalResolver struct {
